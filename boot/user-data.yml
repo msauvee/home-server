@@ -63,6 +63,16 @@ write_files:
       auth_alg=OPEN
       }
     path: /etc/wpa_supplicant/wpa_supplicant.conf
+  # Static IP address
+  - content: |
+      allow-hotplug wlan0
+      iface wlan0 inet static
+        address 192.168.0.99
+        netmask 255.255.255.0
+        gateway 192.168.0.100
+      wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+      iface default inet dhcp
+    path: /etc/network/interfaces.d/wlan0
 
 # These commands will be ran once on first boot only
 runcmd:

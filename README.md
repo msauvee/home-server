@@ -40,6 +40,7 @@ The goal of this step is to flash the server, which contains the following eleme
 * set timezone, add ntp szervice
 * no root, only ssh for msauvee
 * add wifi setup
+* static ip on wlan0
 
 The requirements are:
 * a computer to flash the SD: we will use a mac
@@ -67,6 +68,7 @@ Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>)
 
 Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>): 
 `$ flash --hostname <hostname> --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
+
 
 ## How to install docker
 
