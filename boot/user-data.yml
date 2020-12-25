@@ -8,7 +8,7 @@
 # Documentation: http://cloudinit.readthedocs.io/en/0.7.9/index.html
 
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
-hostname: home-srv0
+hostname: will-be-replaced
 manage_etc_hosts: true
 
 # You could modify this for your own user information

@@ -61,16 +61,24 @@ We will use `/dev/disk5`. `flash` will ask to confirm the device.
 If the raspberry model is Zero or 3, the UART should be desablez, so add `--bootconf ./boot/no-uart-config-for-pi0-3.txt`to the flash command line.
 
 Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>): 
-`$ flash --bootconf ./boot/no-uart-config-for-pi0-3.txt --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
+`$ flash --hostname <hostname> --bootconf ./boot/no-uart-config-for-pi0-3.txt --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
 
 ### Raspberry 4
 
 Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>): 
-`$ flash --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
+`$ flash --hostname <hostname> --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
 
 ## How to install docker
 
 see [this tutorial](https://blog.hypriot.com/getting-started-with-docker-and-mac-on-the-raspberry-pi/)
+
+## How to install Nginx
+
+Use image fropm https://hub.docker.com/r/tobi312/rpi-nginx/
+Create conf files in tata/nginx
+`$ mkdir -p /home/msauvee/data/nginx/{.ssl,html} && mkdir -p /home/msauvee/data/nginx/.config/nginx && touch /home/msauvee/data/nginx/.config/nginx/default.conf`
+
+`$ docker run --name nginx -d -p 80:80 -p 443:443 -v /home/msauvee/data/nginx/.ssl:/etc/nginx/ssl:ro -v /home/msauvee/data/nginx/.config/nginx:/etc/nginx/conf.d:ro -v /home/msauvee/data/nginx/html:/var/www/html tobi312/rpi-nginx`
 
 
 ## Useful sources
