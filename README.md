@@ -60,14 +60,20 @@ We will use `/dev/disk5`. `flash` will ask to confirm the device.
 ### Raspberry Zero or 3
 
 If the raspberry model is Zero or 3, the UART should be desablez, so add `--bootconf ./boot/no-uart-config-for-pi0-3.txt`to the flash command line.
+The file ./boot/user-data.yml will probably not work as it reply opn apt-get update/upgrade by cloud-init which require eth0. You can move apt-get update/upgrade in `runcmd` section.
 
 Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>): 
 `$ flash --hostname <hostname> --bootconf ./boot/no-uart-config-for-pi0-3.txt --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
 
+
 ### Raspberry 4
+
+The raspberry should be connected on ethernet as the apt-get update/upgrade are done before wlan0 is up !
 
 Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>): 
 `$ flash --hostname <hostname> --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
+
+Check the apt-get update and upgrade occurs !!!
 
 
 ## How to install docker

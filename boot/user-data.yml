@@ -10,6 +10,8 @@
 # Set your hostname here, the manage_etc_hosts will update the hosts file entries as well
 hostname: will-be-replaced
 manage_etc_hosts: true
+# don't write debian.org into apt mirrors
+apt_preserve_sources_list: true
 
 # You could modify this for your own user information
 users:
@@ -18,19 +20,17 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker
-    ssh-import-id: None
     lock_passwd: true
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINRHx6QsSOif+lnWLmsqg6moeS809EAut2I58b/RNHTt mickael@sauvee.com
 
-# Update apt packages on first boot
+
+# Update apt packages does not work due to problem of clock
+# which lead to 'Release file for http://rasbian.raspberrypi/org/raspbian/dists/buster/InRelease is not valid yet'
 package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 
-# Install any additional apt packages you need here
-packages:
- - ntp
 
 # Set the locale of the system ... DOES NOT WORK !!!!
 # locale: "fr_FR.UTF-8"
@@ -46,12 +46,10 @@ timezone: "Europe/Paris"
 write_files:
   - content: |
       allow-hotplug wlan0
-      iface wlan0 inet dhcp
       wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
-      iface default inet dhcp
     path: /etc/network/interfaces.d/wlan0
   - content: |
-      country=YourContryCode
+      country=fr
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
       update_config=1
       network={
@@ -65,14 +63,20 @@ write_files:
     path: /etc/wpa_supplicant/wpa_supplicant.conf
   # Static IP address
   - content: |
+      auto wlan0
       allow-hotplug wlan0
       iface wlan0 inet static
-        address 192.168.0.99
-        netmask 255.255.255.0
-        gateway 192.168.0.100
+      address 192.168.0.99
+      netmask 255.255.255.0
+      gateway 192.168.0.100
+      dns-nameservers 8.8.8.8 8.8.4.4
       wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
-      iface default inet dhcp
-    path: /etc/network/interfaces.d/wlan0
+      
+      auto eth0
+      iface eth0 inet static
+      address 192.168.0.98
+      netmask 255.255.255.0
+    path: /etc/network/interfaces
 
 # These commands will be ran once on first boot only
 runcmd:
@@ -80,3 +84,4 @@ runcmd:
   - 'systemctl restart avahi-daemon'
   # Activate WiFi interface
   - 'ifup wlan0'
+
