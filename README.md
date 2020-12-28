@@ -46,7 +46,7 @@ The requirements are:
 * a computer to flash the SD: we will use a mac
 * the url of hypriot: we will use las version on on hypriot github https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip
 * credention to the wifi: ssid and password (do not use quote in the `flash`command line)
-* knwon the device (SD card) on the computer
+* know the device (SD card) on the computer 
 
 To know the device (SD card) on the computer, launch `diskutil list` on macos:
 ```

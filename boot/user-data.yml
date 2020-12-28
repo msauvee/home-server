@@ -25,12 +25,11 @@ users:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINRHx6QsSOif+lnWLmsqg6moeS809EAut2I58b/RNHTt mickael@sauvee.com
 
 
-# Update apt packages does not work due to problem of clock
+# Update apt packages does not work due to a problem of clock
 # which lead to 'Release file for http://rasbian.raspberrypi/org/raspbian/dists/buster/InRelease is not valid yet'
-package_update: true
-package_upgrade: true
-package_reboot_if_required: true
-
+package_update: false
+package_upgrade: false
+package_reboot_if_required: false
 
 # Set the locale of the system ... DOES NOT WORK !!!!
 # locale: "fr_FR.UTF-8"
@@ -78,10 +77,18 @@ write_files:
       netmask 255.255.255.0
     path: /etc/network/interfaces
 
+mounts:
+  - [ UUID=AC17-D287, /opt/data, "exfat", "defaults,auto,nofail", "0", "0" ]
+
 # These commands will be ran once on first boot only
 runcmd:
   # Pickup the hostname changes
   - 'systemctl restart avahi-daemon'
-  # Activate WiFi interface
-  - 'ifup wlan0'
+  # apt-get update/upgrade (does not work with package_update and package_upgrade)
+  - apt-get update 
+  - apt-get upgrade
+  # install exfat-fuse for SSD
+  - apt-get -y install exfat-fuse
+
+
 
