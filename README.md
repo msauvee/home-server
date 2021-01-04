@@ -46,8 +46,10 @@ The requirements are:
 * a computer to flash the SD: we will use a mac
 * the url of hypriot: we will use las version on on hypriot github https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip
 * credention to the wifi: ssid and password (do not use quote in the `flash`command line)
-* know the device (SD card) on the computer 
+* know the device id (SD card) on the computer (see bellow)
+* check docker version did not changed (see [bellow](#find-the-device-id))
 
+### Find the device id 
 To know the device (SD card) on the computer, launch `diskutil list` on macos:
 ```
 /dev/disk5 (external, physical):
@@ -56,6 +58,9 @@ To know the device (SD card) on the computer, launch `diskutil list` on macos:
    1:             Windows_FAT_32 NO NAME                 15.9 GB    disk5s1
 ```
 We will use `/dev/disk5`. `flash` will ask to confirm the device.
+
+### Docker version
+The current docker version is `20.10.1, build 831ebea`. If docker is a newer version, it may have change the iptables. The current section on iptables of `/boot/user-data.yml` may be obsolete. You will see that if you can't connect to docker images or start docker. See [this section](#how-to-setup-iptables) if this is the case.
 
 ### Raspberry Zero or 3
 
@@ -132,13 +137,8 @@ apt-get upgrade -y
 apt-get install certbot -y
 ```
 
-docker run --name nginx -d -p 80:80 -p 443:443 \
--v /opt/data/homesrv0/nginx/conf:/etc/nginx:ro \
--v /opt/data/homesrv0/nginx/www:/var/www \
--v /opt/data/homesrv0/nginx/letsencrypt:/var/letsencrypt \
-arm32v7/nginx
 
-### IPTables
+### How to setup iptables ?
 
 If docker version change, the iptables enforced by docker may change. You have to redo the folowwing command to generate an iptables configuration taking into account docker rules and our required rules.
 
@@ -166,4 +166,5 @@ Good to know:
  * [How to get Docker running on your Raspberry Pi using Mac OS X](https://blog.hypriot.com/getting-started-with-docker-and-mac-on-the-raspberry-pi/)
  * [Deploying NGINX and NGINX Plus on Docker](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-docker/)
  * [Docker and iptables](https://docs.docker.com/network/iptables/)
+ * [Sécuriser mon serveur Docker avec un pare-feu minimaliste](https://www.grottedubarbu.fr/docker-firewall/)
  * [inrupt](https://inrupt.com/) 
