@@ -71,22 +71,87 @@ Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>)
 The raspberry should be connected on ethernet as the apt-get update/upgrade are done before wlan0 is up !
 
 Flash with the following command (replace <my_wifi_ssid> and <my_wifi_password>): 
-`$ flash --hostname <hostname> --userdata ./boot/user-data.yml --ssid <my_wifi_ssid> --password <my_wifi_password> https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip`
+```
+$ flash --hostname <hostname> \
+  --userdata ./boot/user-data.yml \
+  --ssid <my_wifi_ssid> \
+  --password <my_wifi_password> \
+  https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.3/hypriotos-rpi-v1.12.3.img.zip
+```
 
-Check the apt-get update and upgrade occurs !!!
+Connect through ssh, and check the apt-get update and upgrade occurs correctly ((this bug)[https://github.com/hypriot/image-builder-rpi/issues/304] is not fixed adn still occures often). The command `$ apt-cache policy iptables-persistent` should return somthing like:
+```
+iptables-persistent:
+  Installed: 1.0.11+deb10u1
+  Candidate: 1.0.11+deb10u1
+  Version table:
+ *** 1.0.11+deb10u1 500
+        500 http://raspbian.raspberrypi.org/raspbian buster/main armhf Packages
+        100 /var/lib/dpkg/status
+```
+If you do not get the expected result, launch `$ sudo cloud-init clean --reboot`.
 
+Check the SSD is mounted with the command `$ ls /opt/data` which should not be empty.
 
-## How to install docker
-
-see [this tutorial](https://blog.hypriot.com/getting-started-with-docker-and-mac-on-the-raspberry-pi/)
+If you do not get the expected result, launch `$ sudo reboot`.
 
 ## How to install Nginx
 
 Use image fropm https://hub.docker.com/r/tobi312/rpi-nginx/
-Create conf files in tata/nginx
-`$ mkdir -p /home/msauvee/data/nginx/{.ssl,html} && mkdir -p /home/msauvee/data/nginx/.config/nginx && touch /home/msauvee/data/nginx/.config/nginx/default.conf`
+* create conf files in /opt/data/homeserv0/nginx/conf
+* create content files in /opt/data/homeserv0/nginx/wwww
+* add default error pages
 
-`$ docker run --name nginx -d -p 80:80 -p 443:443 -v /home/msauvee/data/nginx/.ssl:/etc/nginx/ssl:ro -v /home/msauvee/data/nginx/.config/nginx:/etc/nginx/conf.d:ro -v /home/msauvee/data/nginx/html:/var/www/html tobi312/rpi-nginx`
+Get files from project under `nginx` folder and put them on the SSD under server folder.
+
+Todo: 
+* create an nginx image file that to apt-get/updgrade 
+
+### Setup let's encrypt
+
+Create a folder `letsencrypt/live` under `nginx`.
+Create a folder `_letsencrypt`under `nginx/wwww`.
+Generate Diffie-Hellman keys by running this command on your server: `openssl dhparam -out /opt/data/<hostname>/nginx/dhparam.pem 2048`
+Comment out SSL related directives in the configuration: 
+`$ sudo sed -i -r 's/(listen .*443)/\1;#/g; s/(ssl_(certificate|certificate_key|trusted_certificate) )/#;#\1/g' /opt/data/<hostname>/nginx/sites-available/sauvee.com.conf`
+
+Start nginx image:
+```
+$ docker run --name nginx -d -p 80:80 -p 443:443 \
+-v /opt/data/<hostname>/nginx/conf:/etc/nginx:ro \
+-v /opt/data/<hostname>/nginx/www:/var/www \
+-v /opt/data/<hostname>/nginx/letsencrypt:/var/letsencrypt \
+arm32v7/nginx
+```
+
+Connect to the image in ssh: `$ docker exec -it nginx /bin/bash`
+And install cerbot:
+```
+apt-get update
+apt-get upgrade -y
+apt-get install certbot -y
+```
+
+docker run --name nginx -d -p 80:80 -p 443:443 \
+-v /opt/data/homesrv0/nginx/conf:/etc/nginx:ro \
+-v /opt/data/homesrv0/nginx/www:/var/www \
+-v /opt/data/homesrv0/nginx/letsencrypt:/var/letsencrypt \
+arm32v7/nginx
+
+### IPTables
+
+If docker version change, the iptables enforced by docker may change. You have to redo the folowwing command to generate an iptables configuration taking into account docker rules and our required rules.
+
+You have to flash without the content on `/ect/iptables/iptables.conf` of `/boot/user-data.yml`(you can comment it).
+Log through ssh to the server and do the following instructions.
+* create a file `iptable-filter.conf` in `/etc/iptables/` with the content of `/boot/iptable-filter.conf`.
+* load it without flushing other tables: `$ sudo iptables-restore -n /etc/iptables/iptable-filter.conf`
+* saves yout current iptables: `$ sudo iptables-save -f /etc/iptables/iptable.conf`
+* update the section on `/ect/iptables/iptables.conf` of `/boot/user-data.yml`
+
+Good to know:
+ * to save current iptables con figuration into a file : `$ sudo iptables-save -f /etc/iptables/iptables.conf`
+ * to load iptables from a file : `$ sudo iptables-restore /etc/iptables/iptables.conf`
 
 
 ## Useful sources
@@ -94,5 +159,11 @@ Create conf files in tata/nginx
  * [Headless Raspberry Pi 4 SSH WiFi Setup (Mac + Windows, 10 Steps)](https://desertbot.io/blog/headless-raspberry-pi-4-ssh-wifi-setup)
  * [Hypriot](https://blog.hypriot.com/)
  * [Hypriot flash documentation](https://github.com/hypriot/flash)
- * [Clou-init documentation](https://cloudinit.readthedocs.io/en/18.3/)
+ * [Cloud-init documentation](https://cloudinit.readthedocs.io/en/18.3/)
+ * [How To Implement a Basic Firewall Template with Iptables on Ubuntu 14.04](https://www.digitalocean.com/community/tutorials/how-to-implement-a-basic-firewall-template-with-iptables-on-ubuntu-14-04)
+ * [Deploying K8s on Raspberry Pi4 with Hypriot and Cloud-Init](http://www.jedimt.com/2019/12/deploying-k8s-on-raspberry-pi4-with-hypriot-and-cloud-init/)
+ * [External storage configuration](https://www.raspberrypi.org/documentation/configuration/external-storage.md)
+ * [How to get Docker running on your Raspberry Pi using Mac OS X](https://blog.hypriot.com/getting-started-with-docker-and-mac-on-the-raspberry-pi/)
+ * [Deploying NGINX and NGINX Plus on Docker](https://docs.nginx.com/nginx/admin-guide/installing-nginx/installing-nginx-docker/)
+ * [Docker and iptables](https://docs.docker.com/network/iptables/)
  * [inrupt](https://inrupt.com/) 
