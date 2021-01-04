@@ -20,10 +20,7 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker
-    # uncomment following line and remove the 2 other lines
-    #lock_passwd: true
-    lock-passwd: false
-    passwd: $6$rounds=4096$s3v8fGiSKV0P4r3e$J14WzhdsfkM98QBs8Fos6kGIn33CPh19/tX3QDOzINhKHyf/DJeuGkDX59iytjvlldIyH/C1F0DFoIXkBfKji0
+    lock_passwd: true
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINRHx6QsSOif+lnWLmsqg6moeS809EAut2I58b/RNHTt mickael@sauvee.com
 
