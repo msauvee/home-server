@@ -64,7 +64,7 @@ write_files:
       auto wlan0
       allow-hotplug wlan0
       iface wlan0 inet static
-      address 192.168.0.99
+      address 192.168.0.9
       netmask 255.255.255.0
       gateway 192.168.0.100
       dns-nameservers 8.8.8.8 8.8.4.4
@@ -72,7 +72,7 @@ write_files:
       
       auto eth0
       iface eth0 inet static
-      address 192.168.0.98
+      address 192.168.0.8
       netmask 255.255.255.0
     path: /etc/network/interfaces
   # iptables/iptables/rules.v4
