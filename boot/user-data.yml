@@ -23,6 +23,7 @@ users:
     lock_passwd: true
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINRHx6QsSOif+lnWLmsqg6moeS809EAut2I58b/RNHTt mickael@sauvee.com
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEy3O/Udz84TFUB3WmiV0JEonDo+Os5085q4pKEX8ggn kylian@sauvee.com
 
 
 # Update apt packages may not work (see README.md)
